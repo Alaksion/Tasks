@@ -35,7 +35,12 @@ class PriorityRepository(context: Context) {
     }
 
     fun list() : List<PriorityModel>{
-        val list = mDatabase.priorityDao().list()
-        return list
+        return mDatabase.priorityDao().list()
     }
+
+    fun getDescription(priorityId: Int) : String{
+        return mDatabase.priorityDao().getDescriptionById(priorityId)
+    }
+
+
 }

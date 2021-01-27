@@ -16,4 +16,7 @@ interface PriorityDao {
 
     @Query(value = "Delete from Priority")
     fun clear()
+
+    @Query(value = "Select description From priority Where id = :priorityId")
+    fun getDescriptionById(priorityId: Int) : String
 }

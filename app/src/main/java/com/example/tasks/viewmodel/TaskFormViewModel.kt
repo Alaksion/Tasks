@@ -19,30 +19,60 @@ class TaskFormViewModel(application: Application) : AndroidViewModel(application
     private val mPriorities = MutableLiveData<List<PriorityModel>>()
     var priorities = mPriorities
 
-    val mPrioritiesIdList : MutableList<Int> = arrayListOf()
+    val mPrioritiesIdList: MutableList<Int> = arrayListOf()
 
-    private val mCreateSuccess = MutableLiveData<ValidationListener>()
-    val createSuccess : LiveData<ValidationListener> = mCreateSuccess
+    private val mSaveSuccess = MutableLiveData<ValidationListener>()
+    val saveSuccess: LiveData<ValidationListener> = mSaveSuccess
 
-    fun create(description: String, priority: Int, completed: Boolean, dueDate: String){
+    private val mTask = MutableLiveData<TaskModel>()
+    var task: LiveData<TaskModel> = mTask
+
+    fun save(description: String, priority: Int, completed: Boolean, dueDate: String, taskId: Int) {
         val task = TaskModel().apply {
             this.complete = completed
             this.description = description
             this.dueDate = dueDate
             this.priorityId = priority
+            this.id = taskId
         }
-        mTaskRepository.create(task, object : ApiListener<Boolean>{
-            override fun onSuccess(model: Boolean) {
-                mCreateSuccess.value = ValidationListener()
+
+        if (task.id != 0) {
+            mTaskRepository.update(task, object : ApiListener<Boolean> {
+                override fun onSuccess(model: Boolean) {
+                    mSaveSuccess.value = ValidationListener()
+                }
+
+                override fun onError(msg: String) {
+                    mSaveSuccess.value = ValidationListener(msg)
+                }
+            })
+        } else {
+            mTaskRepository.create(task, object : ApiListener<Boolean> {
+                override fun onSuccess(model: Boolean) {
+                    mSaveSuccess.value = ValidationListener()
+                }
+
+                override fun onError(msg: String) {
+                    mSaveSuccess.value = ValidationListener(msg)
+                }
+            })
+        }
+    }
+
+    fun loadPriorities() {
+        mPriorities.value = mPriorityRepository.list()
+    }
+
+    fun load(taskId: Int) {
+        mTaskRepository.getSingle(taskId, object : ApiListener<TaskModel> {
+            override fun onSuccess(model: TaskModel) {
+                mTask.value = model
             }
 
             override fun onError(msg: String) {
-                mCreateSuccess.value = ValidationListener(msg)
+                TODO("Not yet implemented")
             }
-        })
-    }
 
-    fun loadPriorities(){
-        mPriorities.value = mPriorityRepository.list()
+        })
     }
 }

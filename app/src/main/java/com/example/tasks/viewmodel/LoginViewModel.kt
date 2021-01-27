@@ -8,6 +8,7 @@ import com.example.tasks.service.constants.TaskConstants
 import com.example.tasks.service.listener.ApiListener
 import com.example.tasks.service.listener.ValidationListener
 import com.example.tasks.service.models.HeaderModel
+import com.example.tasks.service.models.TaskModel
 import com.example.tasks.service.repository.PersonRepository
 import com.example.tasks.service.repository.PriorityRepository
 import com.example.tasks.service.repository.local.SecurityPreferences
@@ -34,7 +35,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
                 mLoginValidation.value = ValidationListener("")
 
-                RetrofitClient.setHeaders(model.token, model.personKey)
+                RetrofitClient.addHeaders(model.personKey, model.token)
             }
 
             override fun onError(msg: String) {
@@ -50,6 +51,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
         if(!logged){
             mPriorityRepository.fetchAll()
+        } else {
+            RetrofitClient.addHeaders(personKey, tokenKey)
         }
 
         mVerifyUserLogged.value = logged

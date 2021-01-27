@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.tasks.service.listener.ApiListener
 import com.example.tasks.service.listener.ValidationListener
 import com.example.tasks.service.models.HeaderModel
+import com.example.tasks.service.models.TaskModel
 import com.example.tasks.service.repository.PersonRepository
 
 class RegisterViewModel(application: Application) : AndroidViewModel(application) {

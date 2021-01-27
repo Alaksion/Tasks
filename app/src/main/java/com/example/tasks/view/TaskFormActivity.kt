@@ -10,6 +10,7 @@ import android.widget.DatePicker
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.tasks.R
+import com.example.tasks.service.constants.TaskConstants
 import com.example.tasks.service.models.PriorityModel
 import com.example.tasks.viewmodel.TaskFormViewModel
 import kotlinx.android.synthetic.main.activity_register.button_save
@@ -20,6 +21,7 @@ import java.util.*
 class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
     DatePickerDialog.OnDateSetListener {
 
+    private var mTaskId = 0
     private lateinit var mViewModel: TaskFormViewModel
     private val mDateFormate = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 
@@ -31,6 +33,7 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
         observe()
         mViewModel.loadPriorities()
         listeners()
+        loadBundle()
     }
 
     private fun observe() {
@@ -47,13 +50,19 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
             spinner_priority.adapter = adapter
         })
 
-        mViewModel.createSuccess.observe(this, androidx.lifecycle.Observer {
+        mViewModel.saveSuccess.observe(this, androidx.lifecycle.Observer {
             if(!it.getStatus()){
                 Toast.makeText(this, it.getMsg(), Toast.LENGTH_LONG).show()
             } else{
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
+        })
+
+        mViewModel.task.observe(this, androidx.lifecycle.Observer {
+            edit_description.setText(it.description)
+            check_complete.isChecked = it.complete
+            button_date.text = it.dueDate
         })
     }
 
@@ -95,8 +104,16 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
         val dueDate = button_date.text.toString()
         val priority = mViewModel.mPrioritiesIdList[spinner_priority.selectedItemPosition]
 
-        mViewModel.create(description, priority, completed, dueDate)
+        mViewModel.save(description, priority, completed, dueDate, mTaskId)
     }
 
+    private fun loadBundle(){
+        val bundle = intent.extras
+
+        if(bundle != null) {
+            mTaskId = bundle.getInt(TaskConstants.BUNDLE.TASKID)
+            mViewModel.load(mTaskId)
+        }
+    }
 
 }
