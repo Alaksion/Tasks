@@ -1,6 +1,7 @@
 package com.example.tasks.service.repository
 
 import android.content.Context
+import android.text.BoringLayout
 import com.example.tasks.R
 import com.example.tasks.service.listener.ApiListener
 import com.example.tasks.service.models.TaskModel
@@ -35,6 +36,32 @@ class TaskRepository(val context : Context){
         save(listener, call)
     }
 
+    fun delete(taskId: Int, listener: ApiListener<Boolean>) {
+
+        if(!BaseRepository.isConnectionAvailable(context)){
+            val message = context.getString(R.string.ERROR_INTERNET_CONNECTION)
+            listener.onError(message)
+            return
+        }
+
+
+        val call : Call<Boolean> = retrofit.delete(taskId)
+
+        call.enqueue(object : Callback<Boolean> {
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                listener.onError(context.getString(R.string.ERROR_UNEXPECTED))
+            }
+
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (!response.isSuccessful) {
+                    listener.onError((response.errorBody()!!.string()))
+                } else {
+                    response.body()?.let { listener.onSuccess(it) }
+                }
+            }
+        })
+    }
+
     fun all(apiListener: ApiListener<List<TaskModel>>){
         val call : Call<List<TaskModel>> = retrofit.all()
         list(apiListener, call)
@@ -51,6 +78,14 @@ class TaskRepository(val context : Context){
     }
 
     fun getSingle(taskId: Int, apiListener: ApiListener<TaskModel>){
+
+        if(!BaseRepository.isConnectionAvailable(context)){
+            val message = context.getString(R.string.ERROR_INTERNET_CONNECTION)
+            apiListener.onError(message)
+            return
+        }
+
+
         val call: Call<TaskModel> = retrofit.load(taskId)
 
         call.enqueue(object: Callback<TaskModel>{
@@ -68,8 +103,46 @@ class TaskRepository(val context : Context){
         })
     }
 
+    fun completeTask(taskId: Int, apiListener: ApiListener<Boolean>){
+        val call : Call<Boolean> = retrofit.complete(taskId)
+        changeTaskStatus(apiListener, call)
+    }
+
+    fun undoTask(taskId: Int, apiListener: ApiListener<Boolean>){
+        val call : Call<Boolean> = retrofit.undo(taskId)
+        changeTaskStatus(apiListener, call)
+    }
+
+    private fun changeTaskStatus(apiListener: ApiListener<Boolean>, call : Call<Boolean>){
+
+        if(!BaseRepository.isConnectionAvailable(context)){
+            val message = context.getString(R.string.ERROR_INTERNET_CONNECTION)
+            apiListener.onError(message)
+            return
+        }
+
+        call.enqueue(object: Callback<Boolean>{
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                apiListener.onError(context.getString(R.string.ERROR_UNEXPECTED))
+            }
+
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if(!response.isSuccessful){
+                    apiListener.onError(response.errorBody()!!.toString())
+                }
+                response.body()?.let { apiListener.onSuccess(it) }
+            }
+        })
+    }
 
     private fun list(apiListener: ApiListener<List<TaskModel>>, call : Call<List<TaskModel>>){
+
+        if(!BaseRepository.isConnectionAvailable(context)){
+            val message = context.getString(R.string.ERROR_INTERNET_CONNECTION)
+            apiListener.onError(message)
+            return
+        }
+
         call.enqueue(object : Callback<List<TaskModel>>{
             override fun onFailure(call: Call<List<TaskModel>>, t: Throwable) {
                 apiListener.onError(context.getString(R.string.ERROR_UNEXPECTED))
@@ -89,6 +162,13 @@ class TaskRepository(val context : Context){
     }
 
     private fun save(apiListener: ApiListener<Boolean>, call: Call<Boolean>){
+
+        if(!BaseRepository.isConnectionAvailable(context)){
+            val message = context.getString(R.string.ERROR_INTERNET_CONNECTION)
+            apiListener.onError(message)
+            return
+        }
+
         call.enqueue(object : Callback<Boolean> {
             override fun onFailure(call: Call<Boolean>, t: Throwable) {
                 apiListener.onError(context.getString(R.string.ERROR_UNEXPECTED))

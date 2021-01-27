@@ -17,6 +17,13 @@ class PersonRepository(val context: Context) {
     private val retrofit = RetrofitClient.createService(PersonService::class.java)
 
     fun login(email: String, password: String, listener: ApiListener<HeaderModel>) {
+
+        if(!BaseRepository.isConnectionAvailable(context)){
+            val message = context.getString(R.string.ERROR_INTERNET_CONNECTION)
+            listener.onError(message)
+            return
+        }
+
         val call: Call<HeaderModel> = retrofit.login(email, password)
         call.enqueue(object : Callback<HeaderModel> {
 
@@ -44,6 +51,13 @@ class PersonRepository(val context: Context) {
         receiveNews: Boolean,
         listener: ApiListener<HeaderModel>
     ) {
+
+        if(!BaseRepository.isConnectionAvailable(context)){
+            val message = context.getString(R.string.ERROR_INTERNET_CONNECTION)
+            listener.onError(message)
+            return
+        }
+
         val call: Call<HeaderModel> = retrofit.createAccount(name, email, password, receiveNews)
 
         call.enqueue(object : Callback<HeaderModel> {
@@ -63,4 +77,5 @@ class PersonRepository(val context: Context) {
             }
         })
     }
+
 }

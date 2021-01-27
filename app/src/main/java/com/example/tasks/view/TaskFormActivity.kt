@@ -38,7 +38,7 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
 
     private fun observe() {
         mViewModel.priorities.observe(this, androidx.lifecycle.Observer {
-            val list = it.map(fun(i : PriorityModel) : String {
+            val list = it.map(fun(i: PriorityModel): String {
                 mViewModel.mPrioritiesIdList.add(i.id)
                 return i.description
             })
@@ -51,18 +51,30 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
         })
 
         mViewModel.saveSuccess.observe(this, androidx.lifecycle.Observer {
-            if(!it.getStatus()){
+            if (!it.getStatus()) {
                 Toast.makeText(this, it.getMsg(), Toast.LENGTH_LONG).show()
-            } else{
-                startActivity(Intent(this, MainActivity::class.java))
+            } else {
+
+                val message = if (mTaskId == 0) {
+                    getString(R.string.task_created)
+                } else {
+                    getString(R.string.task_updated)
+                }
+
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                 finish()
             }
         })
 
         mViewModel.task.observe(this, androidx.lifecycle.Observer {
+            val dateFormater = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+            val date = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(it.dueDate)
+
             edit_description.setText(it.description)
             check_complete.isChecked = it.complete
-            button_date.text = it.dueDate
+            button_date.text = dateFormater.format(date)
+            val priorityIndex = getPriorityIndex(it.priorityId)
+            spinner_priority.setSelection(priorityIndex)
         })
     }
 
@@ -98,7 +110,7 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
         }
     }
 
-    private fun handleSave(){
+    private fun handleSave() {
         val description = edit_description.text.toString()
         val completed = check_complete.isChecked
         val dueDate = button_date.text.toString()
@@ -107,13 +119,17 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
         mViewModel.save(description, priority, completed, dueDate, mTaskId)
     }
 
-    private fun loadBundle(){
+    private fun loadBundle() {
         val bundle = intent.extras
 
-        if(bundle != null) {
+        if (bundle != null) {
             mTaskId = bundle.getInt(TaskConstants.BUNDLE.TASKID)
             mViewModel.load(mTaskId)
         }
+    }
+
+    private fun getPriorityIndex(priorityId: Int): Int {
+        return mViewModel.mPrioritiesIdList.indexOf(priorityId)
     }
 
 }

@@ -8,6 +8,7 @@ import com.example.tasks.service.constants.TaskConstants
 import com.example.tasks.service.listener.ApiListener
 import com.example.tasks.service.listener.ValidationListener
 import com.example.tasks.service.models.HeaderModel
+import com.example.tasks.service.models.PriorityModel
 import com.example.tasks.service.models.TaskModel
 import com.example.tasks.service.repository.PersonRepository
 import com.example.tasks.service.repository.PriorityRepository
@@ -47,14 +48,24 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     fun verifyLoggedUser() {
         val tokenKey = mSharedPreferences.get(TaskConstants.SHARED.TOKEN_KEY)
         val personKey = mSharedPreferences.get(TaskConstants.SHARED.PERSON_KEY)
-        val logged = (tokenKey.isNotEmpty() && personKey.isNotEmpty())
 
-        if(!logged){
-            mPriorityRepository.fetchAll()
-        } else {
-            RetrofitClient.addHeaders(personKey, tokenKey)
-        }
+        val logged = (tokenKey.isNotEmpty() && personKey.isNotEmpty())
+        RetrofitClient.addHeaders(personKey, tokenKey)
 
         mVerifyUserLogged.value = logged
+
+        if (!logged) {
+            mPriorityRepository.fetchAll(object : ApiListener<List<PriorityModel>> {
+                override fun onSuccess(model: List<PriorityModel>) {
+                    mPriorityRepository.save(model)
+                }
+
+                override fun onError(msg: String) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }
+
     }
 }

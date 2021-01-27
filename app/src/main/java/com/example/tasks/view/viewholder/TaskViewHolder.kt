@@ -16,37 +16,35 @@ import java.util.*
 class TaskViewHolder(itemView: View, val listener: TaskListener) :
     RecyclerView.ViewHolder(itemView) {
 
+    private val mDateFormat: SimpleDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
     private val mPriorityRepository = PriorityRepository(itemView.context)
 
     private var mTextDescription: TextView = itemView.findViewById(R.id.text_description)
     private var mTextPriority: TextView = itemView.findViewById(R.id.text_priority)
     private var mTextDueDate: TextView = itemView.findViewById(R.id.text_due_date)
     private var mImageTask: ImageView = itemView.findViewById(R.id.image_task)
-    private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 
     fun bindData(task: TaskModel) {
 
         this.mTextDescription.text = task.description
+        this.mTextPriority.text = mPriorityRepository.getDescription(task.priorityId)
 
-        val priorityDescription = mPriorityRepository.getDescription(task.priorityId)
-        this.mTextPriority.text = priorityDescription
+        val date = SimpleDateFormat("yyyy-MM-dd").parse(task.dueDate)
+        this.mTextDueDate.text = mDateFormat.format(date)
 
-        val date = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(task.dueDate)
-
-        this.mTextDueDate.text = dateFormat.format(date!!)
-
+        // Faz o tratamento para tarefas já completas
         if (task.complete) {
-            mTextDescription.setTextColor(Color.GRAY)
-            mImageTask.setImageResource(R.drawable.ic_done)
+            mTextDescription.setTextColor(Color.GRAY);
+            mImageTask.setImageResource(R.drawable.ic_done);
         } else {
-            mTextDescription.setTextColor(Color.BLACK)
-            mImageTask.setImageResource(R.drawable.ic_todo)
+            mTextDescription.setTextColor(Color.BLACK);
+            mImageTask.setImageResource(R.drawable.ic_todo);
         }
 
+        // Eventos
         mTextDescription.setOnClickListener { listener.onListClick(task.id) }
-
         mImageTask.setOnClickListener {
-            if(task.complete){
+            if (task.complete) {
                 listener.onUndoClick(task.id)
             } else {
                 listener.onCompleteClick(task.id)
@@ -64,5 +62,7 @@ class TaskViewHolder(itemView: View, val listener: TaskListener) :
                 .show()
             true
         }
+
     }
+
 }
