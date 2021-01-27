@@ -23,7 +23,6 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_login)
 
         mViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
-        supportActionBar?.hide()
 
         verifyLoggedUser()
         setListeners();

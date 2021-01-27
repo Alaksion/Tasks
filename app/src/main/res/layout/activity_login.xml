@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".view.LoginActivity">
+    tools:context=".view.LoginActivity"
+    android:background="@drawable/shape_background">
 
     <ImageView
         android:id="@+id/image_logo"
@@ -29,7 +30,8 @@
         android:inputType="textEmailAddress"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/image_logo" />
+        app:layout_constraintTop_toBottomOf="@id/image_logo"
+        style="@style/LoginEditText"/>
 
     <EditText
         android:id="@+id/edit_password"
@@ -42,7 +44,8 @@
         android:inputType="textPassword"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_email" />
+        app:layout_constraintTop_toBottomOf="@id/edit_email"
+        style="@style/LoginEditText"/>
 
     <Button
         android:id="@+id/button_login"
@@ -51,9 +54,11 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="64dp"
         android:text="@string/entrar"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_password" />
+        app:layout_constraintTop_toBottomOf="@id/edit_password"
+        style="@style/AppButton" />
 
     <TextView
         android:id="@+id/text_new_account"
@@ -64,7 +69,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/text_register" />
+        app:layout_constraintRight_toLeftOf="@id/text_register"
+        style="@style/LoginTextView"/>
 
     <TextView
         android:id="@+id/text_register"
@@ -77,6 +83,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/text_new_account"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        style="@style/LoginTextView"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
